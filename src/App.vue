@@ -3,9 +3,9 @@
     <ion-split-pane content-id="main-content">
       <ion-menu content-id="main-content" type="overlay">
         <ion-content>
-          <ion-list id="inbox-list">
-            <ion-list-header>Inbox</ion-list-header>
-            <ion-note>hi@ionicframework.com</ion-note>
+          <ion-list id="inbox-list" style="height:95vh;position:relative">
+            <img style="margin-bottom:30px" src="@/assets/images/logo.png" width="230" class="logo" alt="image here" />
+           
 
             <ion-menu-toggle auto-hide="false" v-for="(p, i) in appPages" :key="i">
               <ion-item @click="selectedIndex = i" router-direction="root" :router-link="p.url" lines="none" detail="false" class="hydrated" :class="{ selected: selectedIndex === i }">
@@ -13,16 +13,22 @@
                 <ion-label>{{ p.title }}</ion-label>
               </ion-item>
             </ion-menu-toggle>
+
+            <div style="bottom:0px;position:absolute">
+              <ion-list-header slot="end" style="font-size:16px">{{ authStore?.user?.name || 'Tumisang' }}</ion-list-header>
+              <ion-note style="margin-bottom:10px;">{{ authStore?.user?.email || 'user@example.com' }}</ion-note>
+
+              <ion-menu-toggle @click="logout()">
+                <ion-item  style="--background:red;--color:white" lines="none"  detail="false" class="hydrated" >
+                  <ion-icon slot="start" :ios="power" :md="power" style="--color:white;color:white"></ion-icon>
+                  <ion-label>Logout</ion-label>
+                </ion-item>
+              </ion-menu-toggle>
+            </div>
+
           </ion-list>
 
-          <ion-list id="labels-list">
-            <ion-list-header>Labels</ion-list-header>
-
-            <ion-item v-for="(label, index) in labels" lines="none" :key="index">
-              <ion-icon slot="start" :ios="bookmarkOutline" :md="bookmarkSharp"></ion-icon>
-              <ion-label>{{ label }}</ion-label>
-            </ion-item>
-          </ion-list>
+   
         </ion-content>
       </ion-menu>
       <ion-router-outlet id="main-content"></ion-router-outlet>
@@ -31,6 +37,8 @@
 </template>
 
 <script setup lang="ts">
+import { useAuthStore } from '@/stores/auth';
+import router from '@/router';
 import {
   IonApp,
   IonContent,
@@ -47,70 +55,50 @@ import {
 } from '@ionic/vue';
 import { ref } from 'vue';
 import {
-  archiveOutline,
-  archiveSharp,
-  bookmarkOutline,
-  bookmarkSharp,
-  heartOutline,
-  heartSharp,
-  mailOutline,
-  mailSharp,
-  paperPlaneOutline,
-  paperPlaneSharp,
-  trashOutline,
-  trashSharp,
-  warningOutline,
-  warningSharp,
+  power,
+  home,
+  settings,
+
 } from 'ionicons/icons';
+
+const authStore = useAuthStore();
 
 const selectedIndex = ref(0);
 const appPages = [
   {
-    title: 'Inbox',
-    url: '/folder/Inbox',
-    iosIcon: mailOutline,
-    mdIcon: mailSharp,
+    title: 'Home',
+    url: '/',
+    iosIcon: home,
+    mdIcon: home,
   },
   {
-    title: 'Outbox',
-    url: '/folder/Outbox',
-    iosIcon: paperPlaneOutline,
-    mdIcon: paperPlaneSharp,
-  },
-  {
-    title: 'Favorites',
-    url: '/folder/Favorites',
-    iosIcon: heartOutline,
-    mdIcon: heartSharp,
-  },
-  {
-    title: 'Archived',
-    url: '/folder/Archived',
-    iosIcon: archiveOutline,
-    mdIcon: archiveSharp,
-  },
-  {
-    title: 'Trash',
-    url: '/folder/Trash',
-    iosIcon: trashOutline,
-    mdIcon: trashSharp,
-  },
-  {
-    title: 'Spam',
-    url: '/folder/Spam',
-    iosIcon: warningOutline,
-    mdIcon: warningSharp,
+    title: 'Settings',
+    url: '/settings',
+    iosIcon: settings,
+    mdIcon: settings,
   },
 ];
-const labels = ['Family', 'Friends', 'Notes', 'Work', 'Travel', 'Reminders'];
 
 const path = window.location.pathname.split('folder/')[1];
 if (path !== undefined) {
   selectedIndex.value = appPages.findIndex((page) => page.title.toLowerCase() === path.toLowerCase());
 }
+
+const logout = () => {
+  authStore.user = null;
+  router.push('/login');
+};
+
 </script>
 
 <style scoped>
+
+.logo{
+    border-radius:15px;
+    display:block;
+    margin:0 auto;
+  }
+
 ion-menu ion-content {
   --background: var(--ion-item-background, var(--ion-background-color, #fff));
 }
@@ -163,11 +151,11 @@ ion-menu.md ion-item {
 }
 
 ion-menu.md ion-item.selected {
-  --background: rgba(var(--ion-color-primary-rgb), 0.14);
+  --background: rgba(var(--ion-color-danger-rgb), 0.14);
 }
 
 ion-menu.md ion-item.selected ion-icon {
-  color: var(--ion-color-primary);
+  color: var(--ion-color-danger);
 }
 
 ion-menu.md ion-item ion-icon {
@@ -198,7 +186,7 @@ ion-menu.ios ion-item {
 }
 
 ion-menu.ios ion-item.selected ion-icon {
-  color: var(--ion-color-primary);
+  color: var(--ion-color-danger);
 }
 
 ion-menu.ios ion-item ion-icon {
@@ -228,6 +216,6 @@ ion-note {
 }
 
 ion-item.selected {
-  --color: var(--ion-color-primary);
+  --color: var(--ion-color-danger);
 }
 </style>
