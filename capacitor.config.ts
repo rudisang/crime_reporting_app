@@ -2,7 +2,7 @@ import { CapacitorConfig } from '@capacitor/cli';
 
 const config: CapacitorConfig = {
   appId: 'io.ionic.starter',
-  appName: 'Home Assist',
+  appName: 'Crime App BW',
   webDir: 'dist',
   bundledWebRuntime: false,
   plugins: {

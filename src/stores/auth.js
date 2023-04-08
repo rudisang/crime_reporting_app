@@ -4,14 +4,14 @@ import router from '../router/index'
 import { Preferences } from '@capacitor/preferences';
 
 axios.defaults.baseURL = "https://gae.co.bw/"
-// axios.defaults.baseURL = "http://192.168.0.188:8000/"
+// axios.defaults.baseURL = "http://127.0.0.1:8000/"
 // const test = await authStore.getToken()
 export const useAuthStore = defineStore('auth', {
     state: () => {
         return {
             authenticated: false,
             base_url: "https://gae.co.bw/",
-            // base_url: "http://192.168.0.188:8000/",
+            // base_url: "http://127.0.0.1:8000/",
             error: null,
             token: null,
             user: null,
@@ -53,8 +53,9 @@ export const useAuthStore = defineStore('auth', {
             }
           };
 
-          await axios.post('/api/login', {
+          await axios.post('/api/v1/auth/login', {
             email: email,
+            device_name: 'Mobile',
             password: password
           }, config).then((res) => {
             
@@ -63,17 +64,18 @@ export const useAuthStore = defineStore('auth', {
             console.log('#######################################################')
             this.authenticated = true;
 
+            console.log(res.data)
             this.user = res.data.user;
             this.token = res.data.token;
             this.setToken(res.data.token);
             
-
           }).catch((error) => {
             this.error = error.response.data.message;
           });
 
           
         },
+
         async logout() {
 
             const config = {

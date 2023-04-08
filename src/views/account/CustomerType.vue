@@ -5,20 +5,20 @@
           <ion-buttons slot="start">
             <ion-menu-button color="danger"></ion-menu-button>
           </ion-buttons>
-          <ion-title>Account Type</ion-title>
+          <ion-title>Location</ion-title>
         </ion-toolbar>
       </ion-header>
   
       <ion-content :fullscreen="true">
         <ion-header collapse="condense">
           <ion-toolbar>
-            <ion-title size="large">Account Type</ion-title>
+            <ion-title size="large">Location</ion-title>
           </ion-toolbar>
         </ion-header>
   
         <div style="width:100%;display:flex;align-items:center;justify-content:center;flex-direction:column;height:80vh">
 
-          <h6 style="font-weight:900">Select Your Account Type</h6>
+          <h6 style="font-weight:900">Select Your Address</h6>
 
           <ion-card style="border-radius:15px;box-shadow:none;width:93%" color="light">
             <ion-card-header>
@@ -27,7 +27,7 @@
             </ion-card-header>
 
             <ion-card-content>
-              <h4 style="font-weight:900;text-align:center;margin-bottom:10px" >Residential</h4>
+              <h4 style="font-weight:900;text-align:center;margin-bottom:10px" >Use My Current Location</h4>
               <ion-button router-link="/profile/create/customer-account/individual" color="danger" style="margin:0 auto;display:block;width:70%;--box-shadow:none">Select</ion-button>
 
             </ion-card-content>
@@ -40,7 +40,7 @@
             </ion-card-header>
 
             <ion-card-content>
-              <h4 style="font-weight:900;text-align:center;margin-bottom:10px" >Commercial</h4>
+              <h4 style="font-weight:900;text-align:center;margin-bottom:10px" >Use My Home Address</h4>
               <ion-button router-link="/profile/create/customer-account/company" color="danger" style="margin:0 auto;display:block;width:70%;--box-shadow:none">Select</ion-button>
 
             </ion-card-content>

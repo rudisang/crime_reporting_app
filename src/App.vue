@@ -58,6 +58,7 @@ import {
   power,
   home,
   settings,
+  shieldHalf
 
 } from 'ionicons/icons';
 
@@ -70,6 +71,12 @@ const appPages = [
     url: '/',
     iosIcon: home,
     mdIcon: home,
+  },
+  {
+    title: 'Report Crime',
+    url: '/profile/type/customer-account',
+    iosIcon: shieldHalf,
+    mdIcon: shieldHalf,
   },
   {
     title: 'Settings',

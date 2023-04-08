@@ -15,6 +15,10 @@
                   </ul>
               </div>
 
+              <div class="success-container" v-if="success">
+                  {{ success }}
+              </div>
+
               <div class="mt-3">
                 <ion-label class="fw-bold dark-text">Email</ion-label>
                 <ion-input v-model="form.email" type="email"  class="form-control" placeholder="Enter Email"></ion-input>
@@ -45,15 +49,21 @@
   import { Preferences } from '@capacitor/preferences';
   import {  useAuthStore } from '@/stores/auth.js';
   import { reactive, ref } from 'vue';
-  import { useRouter } from 'vue-router';
+  import { useRouter, useRoute } from 'vue-router';
 
   const router = useRouter();
+  const route = useRoute();
+  const success = ref();
   const authStore = useAuthStore();
   const error = ref()
   const form = reactive({
     email: '',
     password: '',
   });
+
+  if(route.query.success){
+    success.value = 'Account created successfully. Please login to continue.';
+  }
 
   const attemptLogin = async () => {
     
@@ -70,7 +80,8 @@
     loading.present();
     await authStore.login(form.email, form.password);
     loading.dismiss();
-    
+    console.log('logged in')
+      console.log(useAuthStore().user)
     if(useAuthStore().error){
       error.value = useAuthStore().error;
       return;
@@ -118,6 +129,16 @@
     background-color: #f8d7da;
     border-color: #f5c2c7;
     color: #721c24;
+    padding: 0.75rem 1.25rem;
+    border: 1px solid transparent;
+    border-radius: 14px;
+    margin-bottom: 1rem;
+  }
+
+  .success-container{
+    background-color: #d4edda;
+    border-color: #c3e6cb;
+    color: #155724;
     padding: 0.75rem 1.25rem;
     border: 1px solid transparent;
     border-radius: 14px;

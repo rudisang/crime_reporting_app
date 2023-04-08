@@ -16,7 +16,9 @@
                 </ul>
             </div>
 
- 
+            <div class="error-container" v-if="error">
+                {{ error }}
+            </div>
 
              <div class="mt-1">
                 <ion-label class="fw-bold dark-text">Name</ion-label>
@@ -65,6 +67,7 @@
   import router from '@/router';
 
     const invalid = ref([]);
+    const error = ref('')
 
     const form = reactive({
       name: '',
@@ -93,20 +96,21 @@
         //     return;
         // }
 
-        // await axios.post('https://gae.co.bw/api/register', form)
-        await axios.post('http://192.168.0.188:8000/api/register', form)
+        await axios.post('https://gae.co.bw/api/v1/auth/register', form)
+        // await axios.post('http://127.0.0.1:8000/api/v1/auth/register', form)
         .then((response) => {
             console.log(response.data);
             form.name = '';
             form.email = '';
             form.password = '';
             form.password_confirmation = '';
-            router.push('/login')
+            router.push('/login?success=1')
             loading.dismiss();
 
         })
-        .catch((error) => {
-            console.log(error.response);
+        .catch((err) => {
+            error.value = err.response.data.error
+            console.log(err.response.data);
             loading.dismiss();
         });
         
@@ -144,8 +148,8 @@
   }
 
   .red-btn{
-    --background: #df1c261b;
-    color: #df1c25;
+    --background: #1ca5df21;
+    color: #1ca5df;
     --border-radius: 5px;
     font-size: 1rem;
     margin-top:4px;
@@ -163,7 +167,7 @@
   }
 
   .red-btn:hover{
-    --background: #e8474f;
+    --background: #1ca5df;
     color: #fff;
     --border-radius: 5px;
     font-size: 1rem;
