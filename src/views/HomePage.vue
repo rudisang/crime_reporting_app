@@ -113,8 +113,8 @@
                       loading.dismiss();
 
                       alert = await alertController.create({
-                        header: 'Panic Alert Sent',
-                        message: 'Your distress signal has been sent to the nearest police station.',
+                        header: 'Panic Alert Sent ✅',
+                        message: 'Your distress signal has been sent to the nearest police station. Please wait for assistance.',
                         buttons: ['OK']
                       });
 
