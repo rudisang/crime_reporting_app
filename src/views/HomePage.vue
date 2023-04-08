@@ -93,7 +93,9 @@
                 
                 }else{
 
-                  await axios.post('https://gae.co.bw/api/v1/report/panic_mode', form, {
+                  await axios.post('https://gae.co.bw/api/v1/report/panic_mode', {
+              location: location.value,
+            }, {
                   headers: {
                     Authorization: `Bearer ${authStore.token}`,
                   },
@@ -153,6 +155,9 @@
                   console.log('Location permission not requested. Requesting permission now.');
                   requestLocationPermission();
                 }
+
+
+                getCurrentLocation();
               };
 
               // Request location permission
