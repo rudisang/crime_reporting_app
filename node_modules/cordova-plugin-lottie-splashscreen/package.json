@@ -1,0 +1,73 @@
+{
+  "name": "cordova-plugin-lottie-splashscreen",
+  "version": "0.9.6",
+  "description": "Apache Cordova plugin to show Lottie animations as the splash screen with Airbnb's Lottie wrapper",
+  "author": "Tim Brust <github@timbrust.de>",
+  "license": "MIT",
+  "types": "./types/index.d.ts",
+  "scripts": {
+    "_postinstall": "husky install || echo \"Warning: unable to add Git hooks, I hope you know what you are doing!\"",
+    "build": "tsc",
+    "lint": "npm run lint:android && npm run lint:ios && npm run lint:typescript",
+    "lint:android": "ktlint src/android",
+    "lint:ios": "swiftlint",
+    "lint:typescript": "tslint -c tslint.json 'www/**/*.ts'",
+    "prepublishOnly": "pinst --disable && npm run build",
+    "postpublish": "pinst --enable",
+    "release": "standard-version -s -a"
+  },
+  "devDependencies": {
+    "@commitlint/cli": "^12.0.0",
+    "@commitlint/config-angular": "^12.0.0",
+    "@types/cordova": "^0.0.34",
+    "husky": "^5.0.9",
+    "lint-staged": "^10.5.4",
+    "pinst": "^2.1.4",
+    "prettier": "^2.2.1",
+    "replace": "^1.2.0",
+    "standard-version": "^9.1.0",
+    "tslint": "^6.1.3",
+    "typescript": "^4.1.4"
+  },
+  "cordova": {
+    "id": "cordova-plugin-lottie-splashscreen",
+    "platforms": [
+      "android",
+      "ios"
+    ]
+  },
+  "engines": {
+    "cordovaDependencies": {
+      ">=0.8.0": {
+        "cordova": ">= 9.0.0",
+        "cordova-android": ">=8.0.0",
+        "cordova-ios": ">=5.0.0",
+        "apple-ios": ">=9.0.0"
+      },
+      ">=0.9.0": {
+        "cordova": ">= 9.0.0",
+        "cordova-android": ">=9.0.0",
+        "cordova-ios": ">=5.0.0",
+        "apple-ios": ">=9.0.0"
+      }
+    }
+  },
+  "keywords": [
+    "cordova",
+    "cordova-plugin",
+    "ecosystem:cordova",
+    "cordova-android",
+    "cordova-ios",
+    "lottie",
+    "lottie-android",
+    "lottie-ios",
+    "bodymovin",
+    "swift",
+    "kotlin"
+  ],
+  "repository": "timbru31/cordova-plugin-lottie-splashscreen",
+  "bugs": {
+    "url": "https://github.com/timbru31/cordova-plugin-lottie-splashscreen/issues"
+  },
+  "funding": "https://github.com/sponsors/timbru31"
+}

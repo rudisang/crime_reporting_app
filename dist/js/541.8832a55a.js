@@ -1,0 +1,6 @@
+"use strict";(self["webpackChunkhome"]=self["webpackChunkhome"]||[]).push([[541],{3541:(e,t,i)=>{i.r(t),i.d(t,{KEYBOARD_DID_CLOSE:()=>s,KEYBOARD_DID_OPEN:()=>o,copyVisualViewport:()=>k,keyboardDidClose:()=>l,keyboardDidOpen:()=>w,keyboardDidResize:()=>f,resetKeyboardAssist:()=>n,setKeyboardClose:()=>g,setKeyboardOpen:()=>c,startKeyboardAssist:()=>p,trackViewportChanges:()=>D});
+/*!
+ * (C) Ionic http://ionicframework.com - MIT License
+ */
+const o="ionKeyboardDidShow",s="ionKeyboardDidHide",a=150;let d={},r={},h=!1;const n=()=>{d={},r={},h=!1},p=e=>{b(e),e.visualViewport&&(r=k(e.visualViewport),e.visualViewport.onresize=()=>{D(e),w()||f(e)?c(e):l(e)&&g(e)})},b=e=>{e.addEventListener("keyboardDidShow",(t=>c(e,t))),e.addEventListener("keyboardDidHide",(()=>g(e)))},c=(e,t)=>{u(e,t),h=!0},g=e=>{y(e),h=!1},w=()=>{const e=(d.height-r.height)*r.scale;return!h&&d.width===r.width&&e>a},f=e=>h&&!l(e),l=e=>h&&r.height===e.innerHeight,u=(e,t)=>{const i=t?t.keyboardHeight:e.innerHeight-r.height,s=new CustomEvent(o,{detail:{keyboardHeight:i}});e.dispatchEvent(s)},y=e=>{const t=new CustomEvent(s);e.dispatchEvent(t)},D=e=>{d=Object.assign({},r),r=k(e.visualViewport)},k=e=>({width:Math.round(e.width),height:Math.round(e.height),offsetTop:e.offsetTop,offsetLeft:e.offsetLeft,pageTop:e.pageTop,pageLeft:e.pageLeft,scale:e.scale})}}]);
+//# sourceMappingURL=541.8832a55a.js.map
