@@ -3,7 +3,7 @@
       <ion-header :translucent="true">
         <ion-toolbar>
           <ion-buttons slot="start">
-            <ion-menu-button color="danger"></ion-menu-button>
+            <ion-menu-button style="color:#1ca5df" ></ion-menu-button>
           </ion-buttons>
           <ion-title>Report Crime</ion-title>
         </ion-toolbar>
@@ -17,7 +17,7 @@
         </ion-header>
   
         <div style="width:98%;margin:0 auto">
-          <ion-button router-link="/profile/type/customer-account" fill="clear" color="danger" style="margin-top:15px">back</ion-button>
+          <ion-button router-link="/profile/type/customer-account" fill="clear" color="#1ca5df" style="margin-top:15px">back</ion-button>
           
           <ion-card style="border-radius:15px;box-shadow:none;width:93%" color="light">
             <ion-card-header>
@@ -32,9 +32,28 @@
                 <ion-textarea type="text" class="form-control" color="dark" placeholder="Enter your statement"></ion-textarea>
               </div>
 
+              <div class="mt-2">
+                <label class="fw-bold">Pictures <span style="color:red">*</span></label>
+                <file-pond
+                @change="setImages($event)"
+                name="test"
+                ref="pond"
+                label-idle="Drop files here Or Click To Upload..."
+                v-bind:allow-multiple="true"
+                accepted-file-types="image/jpeg, image/png, image/jpg"
+                :files="myFiles"
+                :allow-file-size-validation = "true"
+                :allow-file-encode = "true"
+                max-file-size = "2mb"
+                min-file-size = "11kb"
+                max-files="2"
+                v-on:removefile="remove($event)"
+                v-on:init="handleFilePondInit"
+                />
+              </div>
 
-
-              <ion-button color="danger" router-link="/" class="" style="margin:0 auto;display:block;width:70%;--box-shadow:none">Report</ion-button>
+              <br>
+              <ion-button router-link="/" class="red-btn" style="margin:0 auto;display:block;width:70%;--box-shadow:none">Report</ion-button>
 
             </ion-card-content>
 
@@ -47,22 +66,34 @@
                 <ion-textarea type="text" class="form-control" color="dark" placeholder="Enter your statement"></ion-textarea>
               </div>
 
-              <ion-button color="danger" router-link="/" class="" style="margin:0 auto;display:block;width:70%;--box-shadow:none">Report</ion-button>
+              <div class="mt-2">
+                <label class="fw-bold">Pictures <span style="color:red">*</span></label>
+                <file-pond
+                @change="setImages($event)"
+                name="test"
+                ref="pond"
+                label-idle="Drop files here Or Click To Upload..."
+                v-bind:allow-multiple="true"
+                accepted-file-types="image/jpeg, image/png, image/jpg"
+                :files="myFiles"
+                :allow-file-size-validation = "true"
+                :allow-file-encode = "true"
+                max-file-size = "2mb"
+                min-file-size = "11kb"
+                max-files="2"
+                v-on:removefile="remove($event)"
+                v-on:init="handleFilePondInit"
+                />
+              </div>
+
+              <br>
+
+              <ion-button router-link="/" class="red-btn" style="margin:0 auto;display:block;width:70%;--box-shadow:none">Report</ion-button>
 
             </ion-card-content>
 
           </ion-card>
 
-          <!-- <strong class="capitalize">Home Page</strong>
-          <file-pond
-            name="test"
-            ref="pond"
-            label-idle="Drop files here..."
-            v-bind:allow-multiple="true"
-            accepted-file-types="image/jpeg, image/png, application/pdf"
-            server="https://gae.co.bw/api/profile/kyc"
-            v-bind:files="myFiles"
-            v-on:init="handleFilePondInit"/> -->
         </div>
       </ion-content>
     </ion-page>
@@ -72,18 +103,23 @@
 
     import { IonButtons, IonContent, IonHeader, IonMenuButton, IonPage, IonTitle, IonToolbar, IonTextarea,
     IonCard, IonCardHeader, IonCardContent, IonButton, IonLabel } from '@ionic/vue';
-    // import vueFilePond from "vue-filepond";
-    // import "filepond/dist/filepond.min.css";
-    // import "filepond-plugin-image-preview/dist/filepond-plugin-image-preview.min.css";
-    // import FilePondPluginFileValidateType from "filepond-plugin-file-validate-type";
-    // import FilePondPluginImagePreview from "filepond-plugin-image-preview";
+    import vueFilePond from "vue-filepond";
+    import "filepond/dist/filepond.min.css";
+    import "filepond-plugin-image-preview/dist/filepond-plugin-image-preview.min.css";
+    import FilePondPluginFileValidateType from "filepond-plugin-file-validate-type";
+    import FilePondPluginImagePreview from "filepond-plugin-image-preview";
+    import FilePondPluginFileValidateSize from 'filepond-plugin-file-validate-size';
+    import FilePondPluginFileEncode from 'filepond-plugin-file-encode';
 
-    // const FilePond = vueFilePond(
-    //     FilePondPluginFileValidateType,
-    //     FilePondPluginImagePreview
-    // );
+    // Create component
+    const FilePond = vueFilePond(
+        FilePondPluginFileValidateType,
+        FilePondPluginImagePreview,
+        FilePondPluginFileValidateSize,
+        FilePondPluginFileEncode
+    );
 
-    import { ref } from 'vue';
+    import { ref, reactive } from 'vue';
     import { useRoute } from 'vue-router'
     export default {
         name: "app",
@@ -95,19 +131,46 @@
             const accType = ref(route.params.id)
             const pack = ref(90);
 
+            const form = reactive({
+                    location : "",
+                    description: "",
+                    pictures: []
+                })
+
             return {pack, accType}
         },
         methods: {
-            // handleFilePondInit: function () {
-            // console.log("FilePond has initialized");
+            handleFilePondInit(){
+                console.log("FilePond has initialized");
+            },
+            remove(){
 
-            // // FilePond instance methods are available on `this.$refs.pond`
-            // },
+              this.form.pictures = []
+
+              if(this.$refs.pond.getFiles().length == 0){
+                  this.form.pictures = []
+              }else{
+                  this.$refs.pond.getFiles().forEach(el => {
+                      this.form.pictures.push(el.file)
+                  });
+              }
+
+              },
+              setImages(e) {
+
+              if(e.target.files.length == 1){
+                  this.form.pictures.push(e.target.files[0])
+              }else{
+                  this.form.pictures = e.target.files
+              }
+
+              console.log(this.form.pictures)
+              },
         },
         components: {
             // FilePond,
             IonButtons, IonContent, IonHeader, IonMenuButton, IonPage, IonTitle, IonToolbar, IonTextarea,
-            IonCard, IonCardHeader, IonCardContent, IonButton,  IonLabel
+            IonCard, IonCardHeader, IonCardContent, IonButton,  IonLabel, FilePond
         },
     };
   </script>
@@ -134,6 +197,15 @@
   #container strong {
     font-size: 20px;
     line-height: 26px;
+  }
+
+  .red-btn{
+    --background: #1ca5df21;
+    color: #1ca5df;
+    --border-radius: 5px;
+    font-size: 1rem;
+    margin-top:4px;
+    --box-shadow:none;
   }
   
   #container p {

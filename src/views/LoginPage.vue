@@ -57,8 +57,8 @@
   const authStore = useAuthStore();
   const error = ref()
   const form = reactive({
-    email: '',
-    password: '',
+    email: 'nykizy@mailinator.com',
+    password: '123456789',
   });
 
   if(route.query.success){

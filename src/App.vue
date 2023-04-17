@@ -19,7 +19,7 @@
               <ion-note style="margin-bottom:10px;">{{ authStore?.user?.email || 'user@example.com' }}</ion-note>
 
               <ion-menu-toggle @click="logout()">
-                <ion-item  style="--background:red;--color:white" lines="none"  detail="false" class="hydrated" >
+                <ion-item  style="--background:#1ca5df21;--color:white" lines="none"  detail="false" class="hydrated" >
                   <ion-icon slot="start" :ios="power" :md="power" style="--color:white;color:white"></ion-icon>
                   <ion-label>Logout</ion-label>
                 </ion-item>
@@ -58,7 +58,8 @@ import {
   power,
   home,
   settings,
-  shieldHalf
+  shieldHalf, 
+  personCircle
 
 } from 'ionicons/icons';
 
@@ -74,9 +75,15 @@ const appPages = [
   },
   {
     title: 'Report Crime',
-    url: '/profile/type/customer-account',
+    url: '/report/select-address',
     iosIcon: shieldHalf,
     mdIcon: shieldHalf,
+  },
+  {
+    title: 'Profile',
+    url: '/user/profile',
+    iosIcon: personCircle,
+    mdIcon: personCircle,
   },
   {
     title: 'Settings',
@@ -158,11 +165,11 @@ ion-menu.md ion-item {
 }
 
 ion-menu.md ion-item.selected {
-  --background: rgba(var(--ion-color-danger-rgb), 0.14);
+  --background: #1ca5df21;
 }
 
 ion-menu.md ion-item.selected ion-icon {
-  color: var(--ion-color-danger);
+  color: #1ca5df;
 }
 
 ion-menu.md ion-item ion-icon {
@@ -193,7 +200,7 @@ ion-menu.ios ion-item {
 }
 
 ion-menu.ios ion-item.selected ion-icon {
-  color: var(--ion-color-danger);
+  color: #1ca5df;
 }
 
 ion-menu.ios ion-item ion-icon {
@@ -223,6 +230,6 @@ ion-note {
 }
 
 ion-item.selected {
-  --color: var(--ion-color-danger);
+  --color: #1ca5df;
 }
 </style>

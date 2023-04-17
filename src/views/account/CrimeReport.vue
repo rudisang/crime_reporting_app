@@ -3,7 +3,7 @@
       <ion-header :translucent="true">
         <ion-toolbar>
           <ion-buttons slot="start">
-            <ion-menu-button color="danger"></ion-menu-button>
+            <ion-menu-button style="color:#1ca5df"></ion-menu-button>
           </ion-buttons>
           <ion-title>Location</ion-title>
         </ion-toolbar>
@@ -28,7 +28,7 @@
 
             <ion-card-content>
               <h4 style="font-weight:900;text-align:center;margin-bottom:10px" >Use My Current Location</h4>
-              <ion-button router-link="/profile/create/customer-account/individual" color="danger" style="margin:0 auto;display:block;width:70%;--box-shadow:none">Select</ion-button>
+              <ion-button router-link="/profile/create/customer-account/individual" class="red-btn" style="margin:0 auto;display:block;width:70%;--box-shadow:none">Select</ion-button>
 
             </ion-card-content>
           </ion-card>
@@ -41,7 +41,7 @@
 
             <ion-card-content>
               <h4 style="font-weight:900;text-align:center;margin-bottom:10px" >Use My Home Address</h4>
-              <ion-button router-link="/profile/create/customer-account/company" color="danger" style="margin:0 auto;display:block;width:70%;--box-shadow:none">Select</ion-button>
+              <ion-button router-link="/profile/create/customer-account/company" class="red-btn" style="margin:0 auto;display:block;width:70%;--box-shadow:none">Select</ion-button>
 
             </ion-card-content>
           </ion-card>
@@ -108,6 +108,15 @@
     right: 0;
     top: 50%;
     transform: translateY(-50%);
+  }
+
+  .red-btn{
+    --background: #1ca5df21;
+    color: #1ca5df;
+    --border-radius: 5px;
+    font-size: 1rem;
+    margin-top:4px;
+    --box-shadow:none;
   }
   
   #container strong {

@@ -16,7 +16,7 @@
           </ion-toolbar>
         </ion-header>
   
-        <div style="width:100%;display:flex;align-items:center;justify-content:center;flex-direction:column;height:80vh">
+        <div style="width:100%;display:flex;align-items:center;justify-content:center;flex-direction:column;height:35vh">
 
           <ion-card style="border-radius:15px;box-shadow:none;width:93%" @click="panic" >
             <ion-card-header>
@@ -28,16 +28,50 @@
 
         </div>
 
+        <div style="width:100%;">
+
+          <ion-card style="border-radius:15px;box-shadow:none;width:93%"  >
+            <ion-card-header>
+             
+            </ion-card-header>
+
+            <ion-card-content>
+              <h3 style="font-weight:900">MY REPORTS</h3>
+              <ion-list >
+
+                <ion-item v-for="report in reports" :key="report.id">
+                  <!-- <ion-label style="display:flex; justify-content: space-between;"><span>{{ report.description }}</span> <span style="font-size:10px;background:#e1f3fb;padding:5px;border-radius:14px;font-weight:900;color:#1ca5df">{{ new Date(report.created_at).toLocaleDateString() }}</span></ion-label> -->
+                  <ion-label >
+                    <span style="font-size:10px;background:#e1f3fb;padding:5px;border-radius:8px;font-weight:900;color:#1ca5df">{{ new Date(report.created_at).toLocaleDateString() }}</span>
+                    <p style="margin-top:10px;text-transform:capitalize">{{ report.description }}</p> 
+                    <p style="margin-top:10px;display:flex;align-items: center;"> <ion-icon :icon="locationIcon"></ion-icon>{{ report.location }}</p> 
+                  </ion-label>
+                </ion-item>
+
+                <ion-item v-if="reports.length == 0">
+                  <ion-label><span style="color:grey">No Reports Found</span></ion-label>
+                </ion-item>
+
+              </ion-list>
+            </ion-card-content>
+
+          </ion-card>
+
+        </div>
+
       </ion-content>
     </ion-page>
   </template>
   
   <script >
 
-    import { IonButtons, IonContent, IonHeader, IonMenuButton, IonPage, IonTitle, IonToolbar,
-    IonCard, IonCardHeader, loadingController, alertController } from '@ionic/vue';
+    import { IonButtons, IonContent, IonHeader, IonMenuButton, IonPage, IonTitle, IonToolbar, IonItem, IonLabel, IonList, IonIcon,
+    IonCard, IonCardHeader, loadingController, alertController, IonCardContent } from '@ionic/vue';
     import {  Geolocation, GeolocationPosition, PermissionStatus  } from '@capacitor/geolocation';
-    import { ref, reactive } from 'vue';
+    import {
+      location as locationIcon,
+    } from 'ionicons/icons';
+    import { ref, reactive, onMounted } from 'vue';
     import {  useAuthStore } from '@/stores/auth.js';
     import axios from 'axios';
     import router from '@/router';
@@ -64,10 +98,54 @@
             const permission = ref();
             const error = ref(null);
             const success = ref(false);
+            const reports = ref([])
             let alert = null;
 
             const form = reactive({
               location: location.value,
+            });
+
+            // do something when mounted to the DOM
+            onMounted(async () => {
+
+              const loading = await loadingController.create({
+                    message: 'Updating My Reports...',
+                    spinner: 'bubbles'
+              });
+
+              await loading.present();
+
+              if (navigator.geolocation) {
+                  await navigator.geolocation.getCurrentPosition(successCallback, errorCallback);
+              } else {
+                  console.log("Geolocation is not supported by this browser.");
+              }
+
+              await axios.get('/api/v1/report/my-reports', {
+                      headers: {
+                        Authorization: `Bearer ${authStore.token}`,
+                      },
+                    })
+                  .then(async (response) => {
+                      reports.value = response.data.reports;
+                      console.log(response.data.reports);
+                      loading.dismiss();
+
+                  })
+                  .catch(async (err) => {
+                      error.value = err.response.data.error
+                      console.log(err.response.data);
+                      loading.dismiss();
+
+                      alert = await alertController.create({
+                        header: 'Error',
+                        message: err.response.data.message,
+                        buttons: ['OK']
+                      });
+
+                      await alert.present();
+                  });
+              
             });
 
             const panic = async () => {
@@ -79,8 +157,8 @@
 
                 await loading.present();
 
-                await checkLocationPermission();
-              
+                // await checkLocationPermission();
+  
                 if(permission.value == 'denied'){
                   //show alert
                     alert = await alertController.create({
@@ -92,14 +170,19 @@
                   await alert.present();
                 
                 }else{
+                  
+                  const x = location.value;
+                  const array = {"coords": {"latitude": x.coords.latitude, "longitude": x.coords.longitude}}
+                  location.value = array;
 
-                  await axios.post('https://gae.co.bw/api/v1/report/panic_mode', {
-              location: location.value,
-            }, {
-                  headers: {
-                    Authorization: `Bearer ${authStore.token}`,
-                  },
-                })
+                  // await axios.post('https://gae.co.bw/api/v1/report/panic_mode', {
+                  await axios.post('/api/v1/report/panic_mode', {
+                    location: location.value,
+                  }, {
+                      headers: {
+                        Authorization: `Bearer ${authStore.token}`,
+                      },
+                    })
                 //   await axios.post('http://127.0.0.1:8000/api/v1/report/panic_mode', form, {
                 //   headers: {
                 //     Authorization: `Bearer ${authStore.token}`,
@@ -181,9 +264,20 @@
                 location.value = pos;
               };
 
+              const successCallback = async (position) => {
+                  const latitude = position.coords.latitude;
+                  const longitude = position.coords.longitude;
+                  location.value = position;
+                  console.log("Latitude: " + latitude + " Longitude: " + longitude);
+              }
+
+              const errorCallback = (error) => {
+                  console.log("Unable to retrieve your location due to " + error.code + ": " + error.message);
+              }
+
               
 
-            return {panic}
+            return {panic, reports, locationIcon}
         },
         methods: {
             // handleFilePondInit: function () {
@@ -195,7 +289,7 @@
         components: {
             // FilePond,
             IonButtons, IonContent, IonHeader, IonMenuButton, IonPage, IonTitle, IonToolbar,
-            IonCard, IonCardHeader
+            IonCard, IonCardHeader, IonCardContent, IonItem, IonLabel, IonList
         },
     };
   </script>

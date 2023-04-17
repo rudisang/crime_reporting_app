@@ -55,14 +55,19 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import ('../views/account/ServiceProviderType.vue')
   },
   {
-    path: '/profile/type/customer-account',
+    path: '/report/select-address',
     name: 'account-type',
-    component: () => import ('../views/account/CustomerType.vue')
+    component: () => import ('../views/reporting/CrimeReport.vue')
   },
   {
-    path: '/profile/create/service-provider/:id',
+    path: '/report/make/:id',
     name: 'provider-create',
-    component: () => import ('../views/account/create/ServiceProvider.vue')
+    component: () => import ('../views/reporting/MakeReport.vue')
+  },
+  {
+    path: '/user/profile',
+    name: 'profile-user',
+    component: () => import ('../views/reporting/UserProfile.vue')
   },
   {
     path: '/profile/create/customer-account/:id',

@@ -96,7 +96,7 @@
         //     return;
         // }
 
-        await axios.post('https://gae.co.bw/api/v1/auth/register', form)
+        await axios.post('/api/v1/auth/register', form)
         // await axios.post('http://127.0.0.1:8000/api/v1/auth/register', form)
         .then((response) => {
             console.log(response.data);
