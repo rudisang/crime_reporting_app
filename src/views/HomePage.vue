@@ -42,8 +42,12 @@
                 <ion-item v-for="report in reports" :key="report.id">
                   <!-- <ion-label style="display:flex; justify-content: space-between;"><span>{{ report.description }}</span> <span style="font-size:10px;background:#e1f3fb;padding:5px;border-radius:14px;font-weight:900;color:#1ca5df">{{ new Date(report.created_at).toLocaleDateString() }}</span></ion-label> -->
                   <ion-label >
-                    <span style="font-size:10px;background:#e1f3fb;padding:5px;border-radius:8px;font-weight:900;color:#1ca5df">{{ new Date(report.created_at).toLocaleDateString() }}</span>
-                    <p style="margin-top:10px;text-transform:capitalize">{{ report.description }}</p> 
+                    <span style="font-size:10px;background:#00000031;padding:5px;border-radius:8px;font-weight:900;color:#000">{{ report.category.category }}</span>
+                    <span style="margin-left:10px;font-size:10px;background:#e1f3fb;padding:5px;border-radius:8px;font-weight:900;color:#1ca5df">{{ new Date(report.created_at).toLocaleDateString() + " | "+new Date(report.created_at).toLocaleTimeString() }}</span>
+                    <p style="margin-top:10px;text-transform:capitalize">{{ report.description }}</p>
+                    <div v-if="report.images.length > 0">
+                      <img style="margin:10px;width:100px;border-radius:20px" v-for="image in report.images" :key="image.id" :src="authStore.base_url+image.image" alt="">
+                    </div> 
                     <p style="margin-top:10px;display:flex;align-items: center;"> <ion-icon :icon="locationIcon"></ion-icon>{{ report.location }}</p> 
                   </ion-label>
                 </ion-item>
@@ -67,25 +71,17 @@
 
     import { IonButtons, IonContent, IonHeader, IonMenuButton, IonPage, IonTitle, IonToolbar, IonItem, IonLabel, IonList, IonIcon,
     IonCard, IonCardHeader, loadingController, alertController, IonCardContent } from '@ionic/vue';
-    import {  Geolocation, GeolocationPosition, PermissionStatus  } from '@capacitor/geolocation';
+    // import {  Geolocation, GeolocationPosition, PermissionStatus  } from '@capacitor/geolocation';
     import {
       location as locationIcon,
     } from 'ionicons/icons';
     import { ref, reactive, onMounted } from 'vue';
     import {  useAuthStore } from '@/stores/auth.js';
+    import {  useLocationStore } from '@/stores/location.js';
     import axios from 'axios';
     import router from '@/router';
     import { Preferences } from '@capacitor/preferences';
-    // import vueFilePond from "vue-filepond";
-    // import "filepond/dist/filepond.min.css";
-    // import "filepond-plugin-image-preview/dist/filepond-plugin-image-preview.min.css";
-    // import FilePondPeluginFileValidateType from "filepond-plugin-file-validate-type";
-    // import FilePondPluginImagePreview from "filepond-plugin-image-preview";
-
-    // const FilePond = vueFilePond(
-    //     FilePondPluginFileValidateType,
-    //     FilePondPluginImagePreview
-    // );
+ 
 
     export default {
         name: "app",
@@ -94,8 +90,8 @@
         },
         setup(){
             const authStore = useAuthStore();
-            const location = ref();
-            const permission = ref();
+            const locationStore = useLocationStore();
+            const permission = ref("");
             const error = ref(null);
             const success = ref(false);
             const reports = ref([])
@@ -115,36 +111,37 @@
 
               await loading.present();
 
-              if (navigator.geolocation) {
-                  await navigator.geolocation.getCurrentPosition(successCallback, errorCallback);
-              } else {
-                  console.log("Geolocation is not supported by this browser.");
+              //check if the user has given the device permission to access location
+              if(!locationStore.isPermitted){
+                locationStore.initLocation();
               }
-
+              
+              //THIS IS WHERE I RETREIVE ALL MY REPORTS.
+              //WHEN THIS PAGE LOADS IT MAKES A REQUEST TO THIS ENDPOITN TO GET ALL MY REPORTS IF ANY
               await axios.get('/api/v1/report/my-reports', {
                       headers: {
                         Authorization: `Bearer ${authStore.token}`,
                       },
-                    })
-                  .then(async (response) => {
-                      reports.value = response.data.reports;
-                      console.log(response.data.reports);
-                      loading.dismiss();
+                })
+              .then(async (response) => {
+                  reports.value = response.data.reports;
+                  console.log(response.data.reports);
+                  loading.dismiss();
 
-                  })
-                  .catch(async (err) => {
-                      error.value = err.response.data.error
-                      console.log(err.response.data);
-                      loading.dismiss();
+              })
+              .catch(async (err) => {
+                  error.value = err.response.data.error
+                  console.log(err.response.data);
+                  loading.dismiss();
 
-                      alert = await alertController.create({
-                        header: 'Error',
-                        message: err.response.data.message,
-                        buttons: ['OK']
-                      });
-
-                      await alert.present();
+                  alert = await alertController.create({
+                    header: 'Error',
+                    message: err.response.data.message,
+                    buttons: ['OK']
                   });
+
+                  await alert.present();
+              });
               
             });
 
@@ -157,7 +154,7 @@
 
                 await loading.present();
 
-                // await checkLocationPermission();
+                permission.value = locationStore.permission
   
                 if(permission.value == 'denied'){
                   //show alert
@@ -171,23 +168,15 @@
                 
                 }else{
                   
-                  const x = location.value;
-                  const array = {"coords": {"latitude": x.coords.latitude, "longitude": x.coords.longitude}}
-                  location.value = array;
-
+                 
                   // await axios.post('https://gae.co.bw/api/v1/report/panic_mode', {
                   await axios.post('/api/v1/report/panic_mode', {
-                    location: location.value,
+                    location: locationStore.location,
                   }, {
                       headers: {
                         Authorization: `Bearer ${authStore.token}`,
                       },
                     })
-                //   await axios.post('http://127.0.0.1:8000/api/v1/report/panic_mode', form, {
-                //   headers: {
-                //     Authorization: `Bearer ${authStore.token}`,
-                //   },
-                // })
                   .then(async (response) => {
 
                       console.log(response.data);
@@ -223,61 +212,9 @@
                 loading.dismiss();
               }
 
-              // Check for location permission on mount
-              const checkLocationPermission = async () => {
-                const status = await Geolocation.checkPermissions();
+         
 
-                permission.value = status;
-
-                if (status.location === 'denied') {
-                  console.log('Location permission denied.');
-                } else if (status.location === 'granted') {
-                  console.log('Location permission granted.');
-                  getCurrentLocation();
-                } else {
-                  console.log('Location permission not requested. Requesting permission now.');
-                  requestLocationPermission();
-                }
-
-
-                getCurrentLocation();
-              };
-
-              // Request location permission
-              const requestLocationPermission = async () => {
-                const status = await Geolocation.requestPermissions();
-
-                permission.value = status;
-
-                if (status.location === 'granted') {
-                  console.log('Location permission granted.');
-                  getCurrentLocation();
-                } else {
-                  console.log('Location permission denied.');
-                }
-              };
-
-              // Get current location
-              const getCurrentLocation = async () => {
-                const pos = await Geolocation.getCurrentPosition();
-
-                location.value = pos;
-              };
-
-              const successCallback = async (position) => {
-                  const latitude = position.coords.latitude;
-                  const longitude = position.coords.longitude;
-                  location.value = position;
-                  console.log("Latitude: " + latitude + " Longitude: " + longitude);
-              }
-
-              const errorCallback = (error) => {
-                  console.log("Unable to retrieve your location due to " + error.code + ": " + error.message);
-              }
-
-              
-
-            return {panic, reports, locationIcon}
+            return {panic, reports, locationIcon, authStore}
         },
         methods: {
             // handleFilePondInit: function () {
@@ -289,7 +226,7 @@
         components: {
             // FilePond,
             IonButtons, IonContent, IonHeader, IonMenuButton, IonPage, IonTitle, IonToolbar,
-            IonCard, IonCardHeader, IonCardContent, IonItem, IonLabel, IonList
+            IonCard, IonCardHeader, IonCardContent, IonItem, IonLabel, IonList, IonIcon
         },
     };
   </script>

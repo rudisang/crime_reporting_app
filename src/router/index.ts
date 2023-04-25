@@ -56,7 +56,7 @@ const routes: Array<RouteRecordRaw> = [
   },
   {
     path: '/report/select-address',
-    name: 'account-type',
+    name: 'make-report',
     component: () => import ('../views/reporting/CrimeReport.vue')
   },
   {

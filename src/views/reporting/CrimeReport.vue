@@ -28,7 +28,7 @@
 
             <ion-card-content>
               <h4 style="font-weight:900;text-align:center;margin-bottom:10px" >Use My Current Location</h4>
-              <ion-button router-link="/report/make/individual" class="red-btn" style="margin:0 auto;display:block;width:70%;--box-shadow:none">Select</ion-button>
+              <ion-button router-link="/report/make/location" class="red-btn" style="margin:0 auto;display:block;width:70%;--box-shadow:none">Select</ion-button>
 
             </ion-card-content>
           </ion-card>
@@ -41,7 +41,7 @@
 
             <ion-card-content>
               <h4 style="font-weight:900;text-align:center;margin-bottom:10px" >Use My Home Address</h4>
-              <ion-button router-link="/report/make/company" class="red-btn" style="margin:0 auto;display:block;width:70%;--box-shadow:none">Select</ion-button>
+              <ion-button router-link="/report/make/address" class="red-btn" style="margin:0 auto;display:block;width:70%;--box-shadow:none">Select</ion-button>
 
             </ion-card-content>
           </ion-card>

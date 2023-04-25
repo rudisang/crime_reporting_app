@@ -21,12 +21,12 @@ export const useAuthStore = defineStore('auth', {
     },
     getters: {
         loggedIn: (state) => (state.user ? true : false),
-        // getToken: async () => await Preferences.get({ key: 'token' }),
+        useToken:  () => Preferences.get({ key: 'token' }),
     },
     actions: {
 
-        async getToken() {
-          return await Preferences.get({ key: 'token' });
+        getToken() {
+          this.token = Preferences.get({ key: 'token' });
         },
 
         async setToken (token) {
@@ -68,6 +68,7 @@ export const useAuthStore = defineStore('auth', {
             this.user = res.data.user;
             this.token = res.data.token;
             this.setToken(res.data.token);
+            this.setUser(JSON.stringify(res.data.user));
             
           }).catch((error) => {
             this.error = error.response.data.message;

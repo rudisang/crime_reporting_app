@@ -26,10 +26,26 @@
 
             <ion-card-content>
               <h4 style="font-weight:900;text-align:center;margin-bottom:10px" >Incident Report Dashboard</h4>
+              
+              <div class="error-container" v-if="error">
+                  {{ error }}
+              </div>
+
+              <div class="success-container" v-if="success">
+                  {{ success }}
+              </div>
 
               <div class="mt-2">
                 <ion-label class="fw-bold dark-text">Description</ion-label>
                 <ion-textarea type="text" v-model="form.description" class="form-control" color="dark" placeholder="Enter your statement"></ion-textarea>
+              </div>
+
+              <div class="mt-2">
+                <ion-label class="fw-bold dark-text">Select Category</ion-label>
+
+                <ion-select v-model="form.category" class="form-control" aria-label="Fruit" interface="action-sheet" placeholder="Choose...">
+                    <ion-select-option v-for="category in categories" :key="category.id" :value="category.id">{{ category.category }}</ion-select-option>
+                </ion-select>
               </div>
 
               <div class="mt-2">
@@ -67,7 +83,7 @@
   <script >
 
     import { IonButtons, IonContent, IonHeader, IonMenuButton, IonPage, IonTitle, IonToolbar, IonTextarea,
-    IonCard, IonCardHeader, IonCardContent, IonButton, IonLabel, loadingController } from '@ionic/vue';
+    IonCard, IonCardHeader, IonCardContent, IonButton, alertController, IonLabel, loadingController, IonSelect, IonSelectOption } from '@ionic/vue';
     import vueFilePond from "vue-filepond";
     import "filepond/dist/filepond.min.css";
     import "filepond-plugin-image-preview/dist/filepond-plugin-image-preview.min.css";
@@ -77,6 +93,7 @@
     import FilePondPluginFileEncode from 'filepond-plugin-file-encode';
     import {  useAuthStore } from '@/stores/auth.js';
     import axios from 'axios';
+    import {  useLocationStore } from '@/stores/location.js';
 
     // Create component
     const FilePond = vueFilePond(
@@ -86,8 +103,8 @@
         FilePondPluginFileEncode
     );
 
-    import { ref, reactive } from 'vue';
-    import { useRoute } from 'vue-router'
+    import { ref, reactive, onMounted } from 'vue';
+    import { useRoute, useRouter } from 'vue-router'
     export default {
         name: "make-report",
         data: function () {
@@ -95,20 +112,57 @@
         },
         setup(){
             const authStore = useAuthStore();
-            console.log(authStore.user)
+            const locationStore = useLocationStore();
             const route = useRoute()
+            const router = useRouter()
             const location_preference = ref(route.params.id)
-            const pack = ref(90);
+            const error = ref(null)
+            const success = ref(null)
+            const categories = ref([])
+            let alert = null;
+
+            onMounted( async () => {
+
+              location_preference.value = route.params.id
+
+              const loading = await loadingController.create({
+                    message: 'Fetching Categories...',
+                    spinner: 'bubbles'
+              });
+
+              await loading.present();
+              
+              await axios.get('/api/v1/report/get-categories')
+              .then(async (response) => {
+                  categories.value = response.data.categories;
+                  console.log(response.data.categories);
+                  loading.dismiss();
+
+              })
+              .catch(async (err) => {
+                  error.value = err.response.data.error
+                  console.log(err.response.data);
+                  loading.dismiss();
+
+                  alert = await alertController.create({
+                    header: 'Error',
+                    message: err.response.data.message,
+                    buttons: ['OK']
+                  });
+
+                  await alert.present();
+              });
+            })
 
             const form = reactive({
-                    location : "",
-                    lat: "",
-                    lng: "",
-                    description: "",
-                    pictures: []
-                })
+                category : "",
+                preference : location_preference.value,
+                location : location_preference.value == "address" ? authStore.user.area : locationStore.location,
+                description: "",
+                pictures: []
+            })
 
-            return {pack, location_preference, authStore, form}
+            return {location_preference, authStore, form, success, error, categories,  router}
         },
         methods: {
             handleFilePondInit(){
@@ -140,15 +194,23 @@
             async submit(){
 
               const fm = new FormData()
-              if(this.location_preference == "current"){
-                fm.append('lat', this.form.lat)
-                fm.append('lng', this.form.lng)
-              }else{
+        
+              fm.append('category', this.form.category)
+              fm.append('preference', this.form.preference)
+              if(this.form.preference == "address"){
                 fm.append('location', this.form.location)
+              }else{
+                fm.append('location', JSON.stringify(this.form.location))
               }
               fm.append('description', this.form.description)
-              fm.append('pic_one', this.form.pictures[0], "picture_"+Date.now())
-              fm.append('pic_two', this.form.pictures[1], "picture_"+Date.now())
+
+              if(this.form.pictures.length > 0){
+                fm.append('pic_one', this.form.pictures[0], "picture_"+Date.now())
+
+                if(this.form.pictures[1]){
+                  fm.append('pic_two', this.form.pictures[1], "picture_"+Date.now())
+                }
+              }
 
               const loading = await loadingController.create({
                     message: 'Sending Report...',
@@ -157,7 +219,7 @@
 
               await loading.present();
 
-                await axios.post('api/v1/report/make', fm ,
+                await axios.post('/api/v1/report/make', fm ,
                 {
                       headers: {
                         Authorization: `Bearer ${this.authStore.token}`,
@@ -165,10 +227,17 @@
                     }).then((res) => {
 
                     console.log(res.data)
+                    this.success = res.data.message
                     loading.dismiss();
-                }).catch((error) => {
+
+                    //create a setimeout function to refresh the page
+                    setTimeout(() => {
+                      this.router.push('/')
+                    }, 3000);
+
+                }).catch((err) => {
                     this.submissionError = true
-                    console.log(error)
+                    this.error = err.response.data.message
                     loading.dismiss();
                 });
             }
@@ -176,7 +245,7 @@
         components: {
             // FilePond,
             IonButtons, IonContent, IonHeader, IonMenuButton, IonPage, IonTitle, IonToolbar, IonTextarea,
-            IonCard, IonCardHeader, IonCardContent, IonButton,  IonLabel, FilePond
+            IonCard, IonCardHeader, IonCardContent, IonButton,  IonLabel, FilePond, IonSelect, IonSelectOption
         },
     };
   </script>
@@ -189,6 +258,26 @@
     right: 0;
     top: 50%;
     transform: translateY(-50%);
+  }
+
+  .error-container{
+    background-color: #f8d7da;
+    border-color: #f5c2c7;
+    color: #721c24;
+    padding: 0.75rem 1.25rem;
+    border: 1px solid transparent;
+    border-radius: 14px;
+    margin-bottom: 1rem;
+  }
+
+  .success-container{
+    background-color: #d4edda;
+    border-color: #c3e6cb;
+    color: #155724;
+    padding: 0.75rem 1.25rem;
+    border: 1px solid transparent;
+    border-radius: 14px;
+    margin-bottom: 1rem;
   }
 
   .form-control{
