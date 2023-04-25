@@ -18,7 +18,11 @@
   
         <div style="width:98%;margin:0 auto">
           <ion-button router-link="/report/select-address" fill="clear" color="#1ca5df" style="margin-top:15px">back</ion-button>
-          
+
+          <div class="error-container" v-if="!authStore.user.area">
+              you need to update your address first before you can report a crime. <router-link to="/user/profile">click here to update your profile</router-link>
+          </div>
+
           <ion-card style="border-radius:15px;box-shadow:none;width:93%" color="light">
             <ion-card-header>
               <img src="@/assets/images/referee.png" style="display:block;margin:0 auto;width:90px;border-radius:14px" alt="image here">
@@ -69,7 +73,7 @@
               </div>
 
               <br>
-              <ion-button @click="submit()" class="red-btn" style="margin:0 auto;display:block;width:70%;--box-shadow:none">Report</ion-button>
+              <ion-button :disabled="!authStore.user.area" @click="submit()" class="red-btn" style="margin:0 auto;display:block;width:70%;--box-shadow:none">Report</ion-button>
 
             </ion-card-content>
 
