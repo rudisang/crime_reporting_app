@@ -13,10 +13,10 @@ export const useLocationStore = defineStore('location', {
     },
     actions: {
         async initLocation() {
-            // await checkLocationPermission();
+            await this.checkLocationPermission();
 
             //For test ENV
-            await this.getLocation();
+            // await this.getLocation();
         },
 
         getLocation(){
